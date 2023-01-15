@@ -10,6 +10,8 @@ from keyboards.default.users_btn import start_menu_btn
 from keyboards.inline.users_btn import new_films_btn, film_link_btn, films_btn, subscribe_btn
 from loader import dp
 from datetime import datetime, timedelta
+from pytz import timezone
+import textwrap
 
 from utils.misc.check_subscribe import check_user_subscribe
 
@@ -26,11 +28,14 @@ async def bot_start_handler(message: Message):
         btn = await subscribe_btn()
         context = subscribe_text.format(message.from_user.first_name)
         await message.answer(context, reply_markup=btn)
+    btn = await start_menu_btn()
+    await message.answer(start_text, reply_markup=btn)
 
 
 async def bot_statistics_handler(message: Message):
     users, films = await get_bot_statistics()
-    today = datetime.now().strftime('%Y.%m.%d %H:%M')
+    tz = timezone('Asia/Tashkent')
+    today = datetime.now(tz=tz).strftime('%Y.%m.%d %H:%M')
     context = statistics_text.format(today, users, films)
     await message.answer(context)
 
@@ -47,7 +52,7 @@ async def new_films_handler(message: Message):
             btn = await new_films_btn(films)
             context = ''
             for n, item in enumerate(films, 1):
-                context += f'{n}. {item["film_name"]}\n'
+                context += f'{n}. {textwrap.shorten(item["film_name"], width=50, placeholder="...")}\n'
             await message.answer(context, reply_markup=btn)
         else:
             await message.answer("Xozircha yangi filimlar mavjud emas!")
@@ -55,6 +60,7 @@ async def new_films_handler(message: Message):
         btn = await subscribe_btn()
         context = subscribe_text.format(message.from_user.first_name)
         await message.answer(context, reply_markup=btn)
+
 
 async def find_film_handler(message: Message, state: FSMContext):
     is_subs = await check_user_subscribe(message)
@@ -67,7 +73,7 @@ async def find_film_handler(message: Message, state: FSMContext):
             btn = await films_btn(filmss, 1, 2)
             context = f'<b>Natijalar {len(filmss)}\n\n</b>'
             for n, item in enumerate(filmss, 1):
-                context += f'{n}. {item["film_name"]}\n'
+                context += f'{n}. {textwrap.shorten(item["film_name"], width=50, placeholder="...")}\n'
             await message.answer(context, reply_markup=btn)
         else:
             await message.answer(not_found_film_text)
@@ -95,6 +101,7 @@ async def select_film_callback(c: CallbackQuery):
         context = subscribe_text.format(c.from_user.first_name)
         await c.message.answer(context, reply_markup=btn)
 
+
 async def prev_films_callback(c: CallbackQuery, state: FSMContext):
     is_subs = await check_user_subscribe(c)
     if is_subs:
@@ -107,7 +114,7 @@ async def prev_films_callback(c: CallbackQuery, state: FSMContext):
             btn = await films_btn(filmss, int(page), int(page) + 1)
             context = f'<b>Natijalar {len(filmss)}\n\n</b>'
             for n, item in enumerate(filmss, 1):
-                context += f'{n}. {item["film_name"]}\n'
+                context += f'{n}. {textwrap.shorten(item["film_name"], width=50, placeholder="...")}\n'
             await c.message.edit_text(context, reply_markup=btn)
         else:
             await c.answer("Natija yoq!", show_alert=True)
@@ -129,7 +136,7 @@ async def next_films_callback(c: CallbackQuery, state: FSMContext):
             btn = await films_btn(filmss, page, int(page)+1)
             context = f'<b>Natijalar {len(filmss)}\n\n</b>'
             for n, item in enumerate(filmss, 1):
-                context += f'{n}. {item["film_name"]}\n'
+                context += f'{n}. {textwrap.shorten(item["film_name"], width=50, placeholder="...")}\n'
             await c.message.edit_text(context, reply_markup=btn)
         else:
             await c.answer("Natija yoq!", show_alert=True)
