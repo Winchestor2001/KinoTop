@@ -74,7 +74,7 @@ async def get_new_films():
     _3_days_ago = datetime.now() - timedelta(days=3)
     _3_days_ago = _3_days_ago.strftime('%Y-%m-%d')
     with db:
-        films = Films.select().where(Films.date >= _3_days_ago)
+        films = Films.select().where(Films.date >= _3_days_ago).paginate(1, 10)
         films = [model_to_dict(item) for item in films]
         return films
 
