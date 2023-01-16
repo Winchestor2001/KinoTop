@@ -7,7 +7,7 @@ async def admin_menu_btn():
         InlineKeyboardButton("Kanallar", callback_data="channels"),
         InlineKeyboardButton("Xabar yuborish", callback_data="mailing"),
         InlineKeyboardButton("Kino kanalini yangilash", callback_data="edit_films_channel"),
-        InlineKeyboardButton("Barcha kinolarni o'chirish", callback_data="del_all_films"),
+#         InlineKeyboardButton("Barcha kinolarni o'chirish", callback_data="del_all_films"),
     )
     return btn
 
